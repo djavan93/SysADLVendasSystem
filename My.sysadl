@@ -219,7 +219,7 @@ package ArenaComponents {
 	action def ValidarCadastroClienteAN(novoCliente : Cliente) : Boolean {
 		constraint :
 			post-condition ValidarCadastroClienteEQ
-	}
+	delegate novoCliente to novoCliente delegate ValidarCadastroClienteAN to clienteEhValido }
 
 	constraint ValidarCadastroClienteEQ(novoCliente : Cliente) : (clienteEhValido : Boolean) {
 		equation = (novoCliente->nome != null) ? (novoCliente->senha != null && novoCliente->senha > 6) : false
@@ -228,12 +228,12 @@ package ArenaComponents {
 	action def EnviarCadastroClienteAN(clienteEhValido : Boolean) : Cliente {
 		constraint :
 			post-condition EnviarCadastroClienteEQ
-	}
+	delegate EnviarCadastroClienteAN to clienteValidado delegate clienteEhValido to clienteEhValido }
 
 	action def EnviarMensagemRespostaAN(clienteEhValido : Boolean) : String {
 		constraint :
 			post-condition EnviarMensagemRespostaEQ
-	}
+	delegate clienteEhValido to clienteEhValido delegate EnviarMensagemRespostaAN to mensagemResposta }
 
 	constraint EnviarCadastroClienteEQ(clienteEhValido : Boolean) : (clienteValidado : Cliente) { }
 
