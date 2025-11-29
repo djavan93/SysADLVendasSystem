@@ -204,12 +204,16 @@ package ArenaComponents {
 				}
 				emran : EnviarMensagemRespostaAN {
 					using pins :
-						clienteEhValido : Boolean;
+						clienteEhValido1 : Boolean;
 				}
-			delegate novoCliente to vccan
-			flow from vccan to eccan
-			flow from vccan to emran
-		delegate clienteValidado to eccan delegate mensagemResposta to emran delegate novoCliente to novoCliente }
+			delegate novoCliente to novoCliente
+			
+			flow from vccan to clienteEhValido
+			flow from vccan to clienteEhValido1
+			
+		 delegate clienteValidado to eccan
+		 delegate mensagemResposta to emran 
+		}
 	}
 
 	action def ValidarCadastroClienteAN(novoCliente : Cliente) : Boolean {
