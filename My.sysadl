@@ -86,72 +86,72 @@ package ArenaConnectors {
 
 	connector def ConectorApiCliente {
 		participants :
-			~source : CadastroClienteIPT;
-			~destination : CadastroClienteOPT;
+			~source : CadastroClienteOPT;
+			~destination : CadastroClienteIPT;
 		flows :
 			Cliente from source to destination
 	}
 
 	connector def ConectorNotificacao {
 		participants :
-			~source : NotificacaoStatusIPT;
-			~destination : NotificacaoStatusOPT;
+			~source : NotificacaoStatusOPT;
+			~destination : NotificacaoStatusIPT;
 		flows :
 			StatusPedido from source to destination
 	}
 
 	connector def ConectorApiPedido {
 		participants :
-			~source : EnvioPedidoIPT;
-			~destination : EnvioPedidoOPT;
+			~source : EnvioPedidoOPT;
+			~destination : EnvioPedidoIPT;
 		flows :
 			Pedido from source to destination
 	}
 
 	connector def ConectorRecarga {
 		participants :
-			~destination : RecargaOPT;
-			~source : RecargaIPT;
+			~destination : RecargaIPT;
+			~source : RecargaOPT;
 		flows :
 			Recarga from source to destination
 	}
 
 	connector def ConectorPreparoPedido {
 		participants :
-			~source : PreparoPedidoIPT;
-			~destination : PreparoPedidoOPT;
+			~source : PreparoPedidoOPT;
+			~destination : PreparoPedidoIPT;
 		flows :
 			Pedido from source to destination
 	}
 
 	connector def ConectorPedidoConcluido {
 		participants :
-			~source : PedidoConcluidoIPT;
-			~destination : PedidoConcluidoOPT;
+			~source : PedidoConcluidoOPT;
+			~destination : PedidoConcluidoIPT;
 		flows :
 			Pedido from source to destination
 	}
 	
 	connector def ConectorDadosQRCode { 
 		participants : 
-			~ source : DadosQRCodeIPT ; 
-			~ destination : DadosQRCodeOPT ; 
+			~ source : DadosQRCodeOPT ; 
+			~ destination : DadosQRCodeIPT ; 
 		flows : 
 			QRCode from source to destination
 	} 
 	
 	connector def AtualizaQuantidade { 
 		participants : 
-			~ source : ProdutoRetiradoIPT ; 
-			~ destination : ProdutoRetiradoOPT ; 
+			~ source : ProdutoRetiradoOPT ; 
+			~ destination : ProdutoRetiradoIPT ; 
 		flows : 
 			ProdutoRetirado from source to destination
 	} 
 	
 	connector def ConectorResultadoValidacaoCliente { 
 		participants : 
-			~ destination : ResultadoValidacaoClienteOPT ; 
-			~ source : ResultadoValidacaoClienteIPT ;
+			~ destination : ResultadoValidacaoClienteIPT ; 
+			~ source : ResultadoValidacaoClienteOPT ;
 		flows : ResultadoValidacaoCliente from source to destination }
 	}
 
