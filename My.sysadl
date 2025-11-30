@@ -278,12 +278,14 @@ package ArenaComponents {
         return resultado;
 	}
 
-	action def EnviarCadastroClienteAN(clienteValidado : ResultadoValidacaoCliente) : Cliente {
+	action def EnviarCadastroClienteAN(cliente : ResultadoValidacaoCliente) : Cliente {
 		constraint :
 			post-condition EnviarCadastroClienteEQ
-	delegate EnviarCadastroClienteAN to clienteValidado delegate clienteValidado to clienteValidado }
+	 	delegate cliente to cliente 
+	 	delegate EnviarCadastroClienteAN to clienteValidado
+	 }
 	
-	constraint EnviarCadastroClienteEQ(clienteValidado : ResultadoValidacaoCliente) : (clienteValidado : Cliente) {
+	constraint EnviarCadastroClienteEQ(cliente : ResultadoValidacaoCliente) : (clienteValidado : Cliente) {
 	}
 
 	action def EnviarMensagemErroAN(clienteValidado : ResultadoValidacaoCliente) : String {
