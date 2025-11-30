@@ -62,7 +62,7 @@ package SysADL.types {
 			Valor : Int;
 			contaClienteId : Int;
 	}
-}
+datatype QRCode { attributes : dados : String ; } datatype ProdutoRetirado { attributes : produto : Produto ; quantidade : Int ; } }
 
 package ArenaConnectors {
 	import ArenaPorts;
@@ -94,9 +94,9 @@ package ArenaConnectors {
 	connector def ConectorRecarga {
 		participants :
 			~destination : RecargaIPT;
-			~newPort : RecargaOPT;
+			~source : RecargaOPT;
 		flows :
-			Recarga from newPort to destination
+			Recarga from source to destination
 	}
 
 	connector def ConectorPreparoPedido {
@@ -114,7 +114,7 @@ package ArenaConnectors {
 		flows :
 			Pedido from source to destination
 	}
-}
+connector def DadosQRCode { participants : ~ source : DadosQRCodeOPT ; ~ destination : DadosQRCodeIPT ; flows : QRCode from source to destination } connector def AtualizaQuantidade { participants : ~ source : ProdutoRetiradoOPT ; ~ destination : ProdutoRetiradoIPT ; flows : ProdutoRetirado from source to destination } }
 
 package ArenaComponents {
 	import SysADL.types;
@@ -148,19 +148,14 @@ package ArenaComponents {
 			apiResposta : RespostaOPT;
 			pNotificacao : NotificacaoStatusOPT;
 			pRecarga : RecargaIPT;
-	} boundary
+	AtualizaQuantidade : ProdutoRetiradoIPT ; } boundary
 
-	component def MaquinaAutomatica { } boundary
+	component def MaquinaAutomatica { ports : DadosQRCode : DadosQRCodeIPT ; AtualizaQuantidade : ProdutoRetiradoOPT ; } boundary
 
 	component def PainelBalcaoEntrega {
 		ports :
 			pRecebeStatus : NotificacaoStatusIPT;
-	} boundary
-
-	component def GatewayPagamento { }
-
-	component def newComponent { }
-
+	}
 	component def ComputadorBalcao {
 		ports :
 			pStatusPedido : PedidoConcluidoOPT;
@@ -169,7 +164,7 @@ package ArenaComponents {
 
 	component def TelaTouchScreen { } boundary
 
-	component def Sensor { }
+	component def LeitorRFID { }
 
 	component def ARCH1 {
 		configuration {
@@ -240,7 +235,11 @@ package ArenaComponents {
 	constraint EnviarMensagemRespostaEQ(clienteEhValido : Boolean) : (mensagemResposta : String) {
 		equation = clienteEhValido ? "Cadastro concluído com sucesso." : "Os dados fornecidos não são válidos."
 	}
-}
+boundary
+	component def LeitorQRCode { ports : DadosQRCode : DadosQRCodeOPT ; }
+	component def LeitorRFID { }
+	component def ImpressoraQRCode { } boundary
+	component def Catraca { } }
 
 package ArenaPorts {
 	import ArenaComponents;
@@ -301,11 +300,11 @@ package ArenaPorts {
 	port def PedidoConcluidoOPT {
 		flow out Pedido
 	}
-}
+port def DadosQRCodeIPT { flow in QRCode } port def DadosQRCodeOPT { flow out QRCode } port def ProdutoRetiradoIPT { flow in ProdutoRetirado } port def ProdutoRetiradoOPT { flow out ProdutoRetirado } }
 
 Requirement AcessoSistemaFR(1) {
 	text = "O sistema deve permitir o acesso de clientes"
-	satisfied by ArenaComponents.Servidor;
+	satisfied by ArenaComponents.Servidor , ArenaComponents.TerminalAutoatendimento ;
 
 	Requirement AcessoSiteAplicaticoFR(2) {
 		text = "O site e o aplicativo devem estar sempre disponíveis para os usuários"
@@ -314,10 +313,10 @@ Requirement AcessoSistemaFR(1) {
 
 	Requirement AcessoArenaFR(3) {
 		text = "Ao entrar na arena, o cliente deve retirar uma pulseira para realizar compras no local"
-	}
+	satisfied by SysADL.types.Pulseira ; }
 
 	Requirement RecarregarCreditosFR(4) {
-		text = "O sistema deve permitir a recarga de créditos através do site/aplicativo e dos terminais de autoatendimento"
+		text = "O sistema deve permitir a recarga de créditos através do site/aplicativo e dos terminais de autoatendimento" satisfied by ArenaComponents.ArenaPaySystem ;
 
 		Requirement MeioPagamentoFR(4.1) {
 			text = "O sistema deve permitir a recarga através de cartão de crédito/débito e pix"
@@ -325,14 +324,14 @@ Requirement AcessoSistemaFR(1) {
 	}
 
 	Requirement ComprarProdutosFR(5) {
-		text = "O cliente pode realizar compras nos totens de autoatendimento"
+		text = "O cliente pode realizar compras nos totens de autoatendimento" satisfied by ArenaComponents.TotemCompra , ArenaComponents.ArenaPaySystem ;
 
 		Requirement SelecionarItensFR(5.1) {
 			text = "O sistema deve permitir que o cliente selecione itens nos totens de autoatendimento"
-		}
+		satisfied by ArenaComponents.TelaTouchScreen ; }
 
 		Requirement ConfirmarCompraFR(5.2) {
-			text = "O sistema deve exigir que a compra seja confirmada aproximando a pulseira no sensor"
+			text = "O sistema deve exigir que a compra seja confirmada aproximando a pulseira no sensor" satisfied by ArenaComponents.LeitorRFID ;
 
 			Requirement ConfirmarPagamentoFR(5.2.1) {
 				text = "O cliente deve confirmar a compra digitando a senha de 4 dígitos"
@@ -341,11 +340,11 @@ Requirement AcessoSistemaFR(1) {
 
 		Requirement GerarComprovanteFR(5.3) {
 			text = "O sistema deve gerar um comprovante impresso com QR Code ou/e número de ordem de pedido para cada compra"
-		}
+		satisfied by ArenaComponents.ImpressoraQRCode ; }
 	}
 
 	Requirement SairArenaFR(6) {
-		text = "O cliente deve passar pela catraca ao deixar a arena"
+		text = "O cliente deve passar pela catraca ao deixar a arena" satisfied by ArenaComponents.Catraca ;
 
 		Requirement DevolverPulseiraFR(6.1) {
 			text = "O sistema deve disponibilizar pontos de coleta da pulseira na saída"
@@ -377,7 +376,7 @@ Requirement RetirarPulseiraFR(3.1) {
 
 Requirement AssociarPulseiraFR(3.2) {
 	text = "O cliente deve vincular uma pulseira a sua conta aproximando-a do leitor do terminal"
-	derive AcessoSistemaFR.AcessoArenaFR;
+	satisfied by ArenaComponents.LeitorRFID ; derive AcessoSistemaFR.AcessoArenaFR;
 
 	Requirement AssociarOutrasPulseiraFR(3.2.1) {
 		text = "O cliente pode vincular outras pulseiras a sua conta"
@@ -423,7 +422,7 @@ Requirement RetirarPedidoFR(5.4) {
 
 	Requirement RetirarProdutoMaquinaFR(5.4.1) {
 		text = "O sistema deve permitir a retirada de itens prontos em máquinas automáticas mediante leitura do QR Code"
-	}
+	satisfied by ArenaComponents.MaquinaAutomatica ; }
 
 	Requirement ExibirStatusPedidoFR(5.4.2) {
 		text = "O sistema deve exibir em telas no balcão o status do pedido (em produção ou pronto) e o número correspondente, para que o cliente entregue o comprovante e receba o produto"
