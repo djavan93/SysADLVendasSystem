@@ -62,7 +62,24 @@ package SysADL.types {
 			Valor : Int;
 			contaClienteId : Int;
 	}
-datatype QRCode { attributes : dados : String ; } datatype ProdutoRetirado { attributes : produto : Produto ; quantidade : Int ; } }
+	
+	datatype QRCode {
+		attributes : 
+			dados : String ;
+	} 
+	
+	datatype ProdutoRetirado { 
+		attributes : 
+			produto : Produto ; 
+			quantidade : Int ;
+	} 
+	
+	datatype ResultadoValidacaoCliente { 
+		attributes : 
+			cliente : Cliente ; 
+			valido : Boolean ;
+	}
+}
 
 package ArenaConnectors {
 	import ArenaPorts;
@@ -114,7 +131,29 @@ package ArenaConnectors {
 		flows :
 			Pedido from source to destination
 	}
-connector def DadosQRCode { participants : ~ source : DadosQRCodeOPT ; ~ destination : DadosQRCodeIPT ; flows : QRCode from source to destination } connector def AtualizaQuantidade { participants : ~ source : ProdutoRetiradoOPT ; ~ destination : ProdutoRetiradoIPT ; flows : ProdutoRetirado from source to destination } }
+	
+	connector def DadosQRCode { 
+		participants : 
+			~ source : DadosQRCodeOPT ; 
+			~ destination : DadosQRCodeIPT ; 
+		flows : 
+			QRCode from source to destination
+	} 
+	
+	connector def AtualizaQuantidade { 
+		participants : 
+			~ source : ProdutoRetiradoOPT ; 
+			~ destination : ProdutoRetiradoIPT ; 
+		flows : 
+			ProdutoRetirado from source to destination
+	} 
+	
+	connector def ConectorResultadoValidacaoCliente { 
+		participants : 
+			~ destination : ResultadoValidacaoClienteIPT ; 
+			~ source : ResultadoValidacaoClienteOPT ;
+		}
+	}
 
 package ArenaComponents {
 	import SysADL.types;
@@ -195,52 +234,65 @@ package ArenaComponents {
 				}
 				eccan : EnviarCadastroClienteAN {
 					using pins :
-						clienteValidado : Cliente;
+						clienteValidado : ResultadoValidacaoCliente;
 				}
-				emran : EnviarMensagemErroAN {
+				emen : EnviarMensagemErroAN {
 					using pins :
-						clienteEhValido1 : Boolean;
+						clienteValidado1 : ResultadoValidacaoCliente;
 				}
 			delegate novoCliente to novoCliente
 			
 			delegate clienteValidado to eccan
-			delegate mensagemResposta to emran }
+			delegate mensagemResposta to emen 
+			
+			flow from vccan to switch {
+			    case true: clienteValidado
+			}
+		}
 	}
 
-	action def ValidarCadastroClienteAN(novoCliente : Cliente) : Boolean {
+	action def ValidarCadastroClienteAN(novoCliente : Cliente) : ResultadoValidacaoCliente {
 		constraint :
 			post-condition ValidarCadastroClienteEQ
-	delegate novoCliente to novoCliente delegate ValidarCadastroClienteAN to clienteEhValido }
+		delegate novoCliente to novoCliente 
+		delegate ValidarCadastroClienteAN to clienteValidado 
+	}
 
-	constraint ValidarCadastroClienteEQ(novoCliente : Cliente) : (clienteEhValido : Boolean) {
+	constraint ValidarCadastroClienteEQ(novoCliente : Cliente) : (clienteValidado : ResultadoValidacaoCliente) {
 		equation = (novoCliente->nome != null) ? (novoCliente->senha != null && novoCliente->senha > 6) : false
 	}
 	
-	executable def ValidarCadastroClienteEX(in novoCliente : Cliente) : out Boolean {
+	executable def ValidarCadastroClienteEX(in novoCliente : Cliente) : out ResultadoValidacaoCliente {
+		let valido : Boolean = false;
+		
         if (novoCliente->nome != null) {
             if (novoCliente->senha != null && novoCliente->senha > 6) {
-                return true;
-            } else {
-                return false;
+                valido = true;
             }
-        } else {
-            return false;
         }
+        
+        let resultado : ResultadoValidacaoCliente = new ResultadoValidacaoCliente;
+		resultado->valido = valido;
+		resultado->cliente = novoCliente;
+        
+        return resultado;
 	}
 
-	action def EnviarCadastroClienteAN(clienteValidado : Cliente) : Cliente {
+	action def EnviarCadastroClienteAN(clienteValidado : ResultadoValidacaoCliente) : Cliente {
 		constraint :
 			post-condition EnviarCadastroClienteEQ
 	delegate EnviarCadastroClienteAN to clienteValidado delegate clienteValidado to clienteValidado }
 	
-	constraint EnviarCadastroClienteEQ(clienteValidado : Cliente) : (clienteValidado : Cliente) { }
+	constraint EnviarCadastroClienteEQ(clienteValidado : ResultadoValidacaoCliente) : (clienteValidado : Cliente) {
+	}
 
-	action def EnviarMensagemErroAN(clienteEhValido : Boolean) : String {
+	action def EnviarMensagemErroAN(clienteValidado : ResultadoValidacaoCliente) : String {
 		constraint :
 			post-condition EnviarMensagemErroEQ
-	delegate clienteEhValido to clienteEhValido delegate EnviarMensagemErroAN to mensagemErro }
+	delegate clienteValidado to clienteValidado delegate EnviarMensagemErroAN to mensagemErro }
 
-	constraint EnviarMensagemErroEQ(clienteEhValido : Boolean) : (mensagemErro : String) {
+	constraint EnviarMensagemErroEQ(clienteValidado : ResultadoValidacaoCliente) : (mensagemErro : String) {
+		equation = "Os dados fornecidos não são válidos."
 	}
 boundary
 	component def LeitorQRCode { ports : DadosQRCode : DadosQRCodeOPT ; }
@@ -307,7 +359,31 @@ package ArenaPorts {
 	port def PedidoConcluidoOPT {
 		flow out Pedido
 	}
-port def DadosQRCodeIPT { flow in QRCode } port def DadosQRCodeOPT { flow out QRCode } port def ProdutoRetiradoIPT { flow in ProdutoRetirado } port def ProdutoRetiradoOPT { flow out ProdutoRetirado } }
+	
+	port def DadosQRCodeIPT { 
+		flow in QRCode
+	} 
+	
+	port def DadosQRCodeOPT { 
+		flow out QRCode
+	} 
+	
+	port def ProdutoRetiradoIPT { 
+		flow in ProdutoRetirado
+	} 
+	
+	port def ProdutoRetiradoOPT { 
+		flow out ProdutoRetirado
+	} 
+	
+	port def ResultadoValidacaoClienteIPT { 
+		flow in ResultadoValidacaoCliente
+	} 
+	
+	port def ResultadoValidacaoClienteOPT { 
+		flow in ResultadoValidacaoCliente
+	} 
+}
 
 Requirement AcessoSistemaFR(1) {
 	text = "O sistema deve permitir o acesso de clientes"
