@@ -58,7 +58,7 @@
         <description xmi:type="description_1:DiagramDescription" href="platform:/plugin/org.sysadl.viewpoints/description/SysADL_vp.odesign#//@ownedViewpoints[name='SysADL.Structural']/@ownedRepresentations[name='SysADL.BDD']"/>
         <target xmi:type="sysadl:Package" href="My.sysadl#//@packages[name='SysADL.types']"/>
       </ownedRepresentationDescriptors>
-      <ownedRepresentationDescriptors xmi:type="viewpoint:DRepresentationDescriptor" uid="_oM_egJywEfCmZcc3qT5Maw" name="Block Definition Diagram (Structural BDD)" repPath="#_oM9pUJywEfCmZcc3qT5Maw" changeId="1764525188271">
+      <ownedRepresentationDescriptors xmi:type="viewpoint:DRepresentationDescriptor" uid="_oM_egJywEfCmZcc3qT5Maw" name="Block Definition Diagram (Structural BDD)" repPath="#_oM9pUJywEfCmZcc3qT5Maw" changeId="1764527636221">
         <description xmi:type="description_1:DiagramDescription" href="platform:/plugin/org.sysadl.viewpoints/description/SysADL_vp.odesign#//@ownedViewpoints[name='SysADL.Structural']/@ownedRepresentations[name='SysADL.BDD']"/>
         <target xmi:type="sysadl:Package" href="My.sysadl#//@packages[name='ArenaPorts']"/>
       </ownedRepresentationDescriptors>
@@ -4943,7 +4943,7 @@
           <actualMapping xmi:type="description_1:NodeMapping" href="platform:/plugin/org.sysadl.viewpoints/description/SysADL_vp.odesign#//@ownedViewpoints[name='SysADL.Structural']/@ownedRepresentations[name='SysADL.BDD']/@defaultLayer/@containerMappings[name='BDD']/@subContainerMappings[name='BDD.SimplePortDef']/@subNodeMappings[name='BDD.SimplePortDef.FlowType']"/>
         </ownedElements>
       </ownedDiagramElements>
-      <ownedDiagramElements xmi:type="diagram:DNodeList" uid="_Xs9i4s4VEfCZdONrYvvg5A" name="&lt;&lt;in Port>>&#xA;ResultadoValidacaoClienteOPT">
+      <ownedDiagramElements xmi:type="diagram:DNodeList" uid="_Xs9i4s4VEfCZdONrYvvg5A" name="&lt;&lt;out Port>>&#xA;ResultadoValidacaoClienteOPT">
         <target xmi:type="sysadl:SimplePortDef" href="My.sysadl#//@packages[name='ArenaPorts']/@definitions[name='ResultadoValidacaoClienteOPT']"/>
         <semanticElements xmi:type="sysadl:SimplePortDef" href="My.sysadl#//@packages[name='ArenaPorts']/@definitions[name='ResultadoValidacaoClienteOPT']"/>
         <ownedStyle xmi:type="diagram:FlatContainerStyle" uid="_Xs9i484VEfCZdONrYvvg5A" iconPath="/org.sysadl.viewpoints/icons/Property.gif" borderSize="1" borderSizeComputationExpression="1" backgroundStyle="GradientTopToBottom" foregroundColor="140,140,232">

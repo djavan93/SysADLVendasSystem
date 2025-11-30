@@ -381,7 +381,7 @@ package ArenaPorts {
 	} 
 	
 	port def ResultadoValidacaoClienteOPT { 
-		flow in ResultadoValidacaoCliente
+		flow out ResultadoValidacaoCliente
 	} 
 }
 
