@@ -167,19 +167,20 @@ package ArenaComponents {
 				}
 				eccan : EnviarCadastroClienteAN {
 					using pins :
-						clienteEhValido : Boolean;
+						clienteValidado : ResultadoValidacaoCliente;
 				}
-				emran : EnviarMensagemRespostaAN {
+				emen : EnviarMensagemErroAN {
 					using pins :
-						clienteEhValido1 : Boolean;
+						clienteValidado1 : ResultadoValidacaoCliente;
 				}
 			delegate novoCliente to novoCliente
 			
-			flow from vccan to clienteEhValido
-			flow from vccan to clienteEhValido1
+			delegate clienteValidado to eccan
+			delegate mensagemResposta to emen 
 			
-		 delegate clienteValidado to eccan
-		 delegate mensagemResposta to emran 
+			flow from vccan to switch {
+			    case true: clienteValidado
+			}
 		}
 	}
 
@@ -195,12 +196,17 @@ package ArenaComponents {
 	action def EnviarCadastroClienteAN(clienteEhValido : Boolean) : ClienteDT {
 		constraint :
 			post-condition EnviarCadastroClienteEQ
-	delegate EnviarCadastroClienteAN to clienteValidado delegate clienteEhValido to clienteEhValido }
+	 	delegate cliente to cliente 
+	 	delegate EnviarCadastroClienteAN to clienteValidado
+	 }
+	
+	constraint EnviarCadastroClienteEQ(cliente : ResultadoValidacaoCliente) : (clienteValidado : Cliente) {
+	}
 
-	action def EnviarMensagemRespostaAN(clienteEhValido : Boolean) : String {
+	action def EnviarMensagemErroAN(clienteValidado : ResultadoValidacaoCliente) : String {
 		constraint :
-			post-condition EnviarMensagemRespostaEQ
-	delegate clienteEhValido to clienteEhValido delegate EnviarMensagemRespostaAN to mensagemResposta }
+			post-condition EnviarMensagemErroEQ
+	delegate clienteValidado to clienteValidado delegate EnviarMensagemErroAN to mensagemErro }
 
 	constraint EnviarCadastroClienteEQ(clienteEhValido : Boolean) : (clienteValidado : ClienteDT) { }
 
