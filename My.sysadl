@@ -144,7 +144,22 @@ package ArenaComponents {
 
 	 boundary
 
-	component def MaquinaAutomatica { ports : PT_D_1 : DadosQRCodeIPT ; PT_S_2 : ProdutoRetiradoOPT ; configuration { components :  LeitorQRCode : LeitorQRCode { using ports : PT_S_1 : DadosQRCodeOPT ; } delegations :  PT_S_1 to PT_D_1 } } boundary
+	component def MaquinaAutomatica { 
+		ports : 
+			PT_D_1 : DadosQRCodeIPT ; 
+			PT_S_2 : ProdutoRetiradoOPT ; 
+			
+		configuration { 
+			components :  
+				LeitorQRCode : LeitorQRCode { 
+					using ports : 
+					PT_S_1 : DadosQRCodeOPT ;
+				} 
+				
+			delegations :  
+				PT_S_1 to PT_D_1
+		}
+	} boundary
 
 	component def PainelBalcaoEntrega {
 		ports :
@@ -162,7 +177,206 @@ package ArenaComponents {
 
 	component def ARCH1 {
 		
-	configuration { components : Servidor : Servidor { using ports : PT_D_2 : ProdutoRetiradoIPT ; PT_D_5 : CadastroClienteIPT ; PT_S_9 : NotificacaoStatusOPT ; PT_S_10 : PreparoPedidoOPT ; PT_D_11 : PedidoConcluidoIPT ; PT_D_18 : EnvioPedidoIPT ; PT_D_19 : AtualizaSaldoIPT ; } PainelBalcaoEntrega : PainelBalcaoEntrega { using ports : PT_D_9 : NotificacaoStatusIPT ; } ComputadorBalcao : ComputadorBalcao { using ports : PT_S_11 : PedidoConcluidoOPT ; PT_D_10 : PreparoPedidoIPT ; } MaquinaAutomatica : MaquinaAutomatica { using ports : PT_D_1 : DadosQRCodeIPT ; PT_S_2 : ProdutoRetiradoOPT ; } LeitorQRCode : LeitorQRCode { using ports : PT_S_1 : DadosQRCodeOPT ; } ArenaPaySystem : ArenaPaySystem { using ports : PT_D_6 : RecargaIPT ; PT_S_16 : ConfirmaPagamentoOPT ; PT_D_17 : RealizaPagamentoIPT ; PT_S_7 : ConfirmaRecargaOPT ; PT_S_19 : AtualizaSaldoOPT ; } AplicativoCliente : AplicativoCliente { using ports : PT_S_13 : RecargaOPT ; PT_D_12 : ConfirmaRecargaIPT ; } TerminalAutoatendimento : TerminalAutoatendimento { using ports : PT_SD2_3 : InteracaoTela2IOPT ; PT_S_5 : CadastroClienteOPT ; PT_S_6 : RecargaOPT ; PT_D_7 : ConfirmaRecargaIPT ; PT_D_4 : DetectaPulseiraIPT ; } TelaTouchScreen : TelaTouchScreen { using ports : PT_SD1_3 : InteracaoTela1IOPT ; } LeitorRFID1 : LeitorRFID1 { using ports : PT_S_4 : DetectaPulseiraOPT ; } TotemCompra : TotemCompra { using ports : PT_S_18 : EnvioPedidoOPT ; PT_S_15 : DadosQRCodeOPT ; PT_D_14 : DetectaPulseiraIPT ; PT_D_16 : ConfirmaPagamentoIPT ; PT_S_17 : RealizaPagamentoOPT ; } ImpressoraQRCode : ImpressoraQRCode { using ports : PT_D_15 : DadosQRCodeIPT ; } LeitorRFID2 : LeitorRFID2 { using ports : PT_S_14 : DetectaPulseiraOPT ; } Catraca : Catraca { using ports : PT_D_8 : PulseiraDetectadaIPT ; } Detector : Detector { using ports : PT_S_8 : PulseiraDetectadaOPT ; } connectors : Cn1 : CnNotificacao bindings PT_S_9 = PT_D_9 ; Cn2 : CnPreparoPedido bindings PT_S_10 = PT_D_10 ; Cn3 : CnPedidoConcluido bindings PT_S_11 = PT_D_11 ; Cn4 : CnDadosQRCode bindings PT_S_1 = PT_D_1 ; Cn5 : CnAtualizaQuantidade bindings PT_S_2 = PT_D_2 ; Cn6 : CnAtualizaSaldo bindings PT_S_19 = PT_D_19 ; Cn7 : CnConfirmaRecarga bindings PT_S_7 = PT_D_12 ; Cn8 : CnRecarga bindings PT_S_13 = PT_D_6 ; Cn9 : CnConfirmaRecarga bindings PT_S_7 = PT_D_7 ; Cn10 : CnRecarga bindings PT_S_6 = PT_D_6 ; Cn11 : CnApiCliente bindings PT_S_5 = PT_D_5 ; Cn12 : CnInteracaoTela bindings PT_SD1_3 = PT_SD2_3 ; Cn13 : CnDetectaPulseira bindings PT_S_4 = PT_D_4 ; Cn14 : CnApiPedido bindings PT_S_18 = PT_D_18 ; Cn15 : CnPagamento bindings PT_S_17 = PT_D_17 ; Cn16 : CnConfirmaPagamento bindings PT_S_16 = PT_D_16 ; Cn17 : CnDadosQRCode bindings PT_S_15 = PT_D_15 ; Cn18 : CnDetectaPulseira bindings PT_S_14 = PT_D_14 ; Cn19 : CnPulseiraDetectada bindings PT_S_8 = PT_D_8 ; } }
+	configuration { 
+		components : 
+			Servidor : Servidor { 
+				using ports : 
+					PT_D_2 : ProdutoRetiradoIPT ; 
+					PT_D_5 : CadastroClienteIPT ; 
+					PT_S_9 : NotificacaoStatusOPT ; 
+					PT_S_10 : PreparoPedidoOPT ; 
+					PT_D_11 : PedidoConcluidoIPT ; 
+					PT_D_18 : EnvioPedidoIPT ; 
+					PT_D_19 : AtualizaSaldoIPT ;
+			} 
+			
+			PainelBalcaoEntrega : PainelBalcaoEntrega { 
+				using ports : 
+					PT_D_9 : NotificacaoStatusIPT ;
+			} 
+			
+			ComputadorBalcao : ComputadorBalcao { 
+				using ports : 
+					PT_S_11 : PedidoConcluidoOPT ; 
+					PT_D_10 : PreparoPedidoIPT ;
+			} 
+			
+			MaquinaAutomatica : MaquinaAutomatica { 
+				using ports : 
+					PT_D_1 : DadosQRCodeIPT ; 
+					PT_S_2 : ProdutoRetiradoOPT ;
+			} 
+			
+			LeitorQRCode : LeitorQRCode { 
+				using ports : 
+					PT_S_1 : DadosQRCodeOPT ;
+			} 
+			
+			ArenaPaySystem : ArenaPaySystem { 
+				using ports : 
+					PT_D_6 : RecargaIPT ; 
+					PT_S_16 : ConfirmaPagamentoOPT ; 
+					PT_D_17 : RealizaPagamentoIPT ; 
+					PT_S_7 : ConfirmaRecargaOPT ; 
+					PT_S_19 : AtualizaSaldoOPT ;
+			} 
+			
+			AplicativoCliente : AplicativoCliente { 
+				using ports : 
+					PT_S_13 : RecargaOPT ; 
+					PT_D_12 : ConfirmaRecargaIPT ;
+			} 
+			
+			TerminalAutoatendimento : TerminalAutoatendimento { 
+				using ports : 
+					PT_SD2_3 : InteracaoTela2IOPT ; 
+					PT_S_5 : CadastroClienteOPT ; 
+					PT_S_6 : RecargaOPT ; 
+					PT_D_7 : ConfirmaRecargaIPT ; 
+					PT_D_4 : DetectaPulseiraIPT ;
+			} 
+			
+			TelaTouchScreen : TelaTouchScreen { 
+				using ports : 
+					PT_SD1_3 : InteracaoTela1IOPT ;
+			} 
+			
+			LeitorRFID1 : LeitorRFID1 { 
+				using ports : 
+					PT_S_4 : DetectaPulseiraOPT ;
+			} 
+			
+			TotemCompra : TotemCompra { 
+				using ports : 
+					PT_S_18 : EnvioPedidoOPT ; 
+					PT_S_15 : DadosQRCodeOPT ; 
+					PT_D_14 : DetectaPulseiraIPT ; 
+					PT_D_16 : ConfirmaPagamentoIPT ; 
+					PT_S_17 : RealizaPagamentoOPT ;
+			} 
+			
+			ImpressoraQRCode : ImpressoraQRCode { 
+				using ports : 
+					PT_D_15 : DadosQRCodeIPT ;
+			} 
+			
+			LeitorRFID2 : LeitorRFID2 { 
+				using ports : 
+					PT_S_14 : DetectaPulseiraOPT ;
+			} 
+			
+			Catraca : Catraca { 
+				using ports : 
+					PT_D_8 : PulseiraDetectadaIPT ;
+			} 
+			
+			Detector : Detector { 
+				using ports : 
+					PT_S_8 : PulseiraDetectadaOPT ;
+			} 
+			
+			connectors : 
+				Cn1 : CnNotificacao bindings PT_S_9 = PT_D_9 ; 
+				Cn2 : CnPreparoPedido bindings PT_S_10 = PT_D_10 ; 
+				Cn3 : CnPedidoConcluido bindings PT_S_11 = PT_D_11 ; 
+				Cn4 : CnDadosQRCode bindings PT_S_1 = PT_D_1 ; 
+				Cn5 : CnAtualizaQuantidade bindings PT_S_2 = PT_D_2 ; 
+				Cn6 : CnAtualizaSaldo bindings PT_S_19 = PT_D_19 ; 
+				Cn7 : CnConfirmaRecarga bindings PT_S_7 = PT_D_12 ; 
+				Cn8 : CnRecarga bindings PT_S_13 = PT_D_6 ; 
+				Cn9 : CnConfirmaRecarga bindings PT_S_7 = PT_D_7 ; 
+				Cn10 : CnRecarga bindings PT_S_6 = PT_D_6 ; 
+				Cn11 : CnApiCliente bindings PT_S_5 = PT_D_5 ; 
+				Cn12 : CnInteracaoTela bindings PT_SD1_3 = PT_SD2_3 ; 
+				Cn13 : CnDetectaPulseira bindings PT_S_4 = PT_D_4 ; 
+				Cn14 : CnApiPedido bindings PT_S_18 = PT_D_18 ; 
+				Cn15 : CnPagamento bindings PT_S_17 = PT_D_17 ; 
+				Cn16 : CnConfirmaPagamento bindings PT_S_16 = PT_D_16 ; 
+				Cn17 : CnDadosQRCode bindings PT_S_15 = PT_D_15 ; 
+				Cn18 : CnDetectaPulseira bindings PT_S_14 = PT_D_14 ; 
+				Cn19 : CnPulseiraDetectada bindings PT_S_8 = PT_D_8 ;
+		} 
+	}
+
+	component def LeitorQRCode { 
+		ports : PT_S_1 : DadosQRCodeOPT ;
+	}
+	
+	component def LeitorRFID2 { 
+		ports : PT_S_14 : DetectaPulseiraOPT ;
+	} boundary
+	
+	component def ImpressoraQRCode { 
+		ports : PT_D_15 : DadosQRCodeIPT ;
+	} boundary
+	
+	component def Catraca { 
+		ports : PT_D_8 : PulseiraDetectadaIPT ; 
+		
+		configuration { 
+			components :  
+				Detector : Detector { 
+					using ports : 
+						PT_S_8 : PulseiraDetectadaOPT ;
+				} 
+			delegations :  PT_S_8 to PT_D_8
+		}
+	} boundary
+	
+	component def Detector { 
+		ports : PT_S_8 : PulseiraDetectadaOPT ;
+	} 
+	
+	component def TerminalAutoatendimento { 
+		ports : 
+			PT_SD2_3 : InteracaoTela2IOPT ; 
+			PT_S_5 : CadastroClienteOPT ; 
+			PT_S_6 : RecargaOPT ; 
+			PT_D_7 : ConfirmaRecargaIPT ; 
+			PT_D_4 : DetectaPulseiraIPT ; 
+			
+		configuration { 
+			components : 
+				TelaTouchScreen : TelaTouchScreen { 
+					using ports : 
+						PT_SD1_3 : InteracaoTela1IOPT ;
+				} 
+				
+				LeitorRFID1 : LeitorRFID1 { 
+					using ports : 
+						PT_S_4 : DetectaPulseiraOPT ;
+				} 
+				
+				delegations : 
+					PT_SD1_3 to PT_SD2_3 
+					PT_S_4 to PT_D_4
+		}
+	}
+	
+	component def Servidor { 
+		ports : 
+			PT_D_2 : ProdutoRetiradoIPT ; 
+			PT_D_5 : CadastroClienteIPT ; 
+			PT_S_9 : NotificacaoStatusOPT ; 
+			PT_S_10 : PreparoPedidoOPT ; 
+			PT_D_11 : PedidoConcluidoIPT ; 
+			PT_D_18 : EnvioPedidoIPT ; 
+			PT_D_19 : AtualizaSaldoIPT ; 
+			
+		configuration { 
+			components : ArenaPaySystem : ArenaPaySystem { 
+				using ports : 
+					PT_D_6 : RecargaIPT ; 
+					PT_S_16 : ConfirmaPagamentoOPT ; 
+					PT_D_17 : RealizaPagamentoIPT ; 
+					PT_S_7 : ConfirmaRecargaOPT ; 
+					PT_S_19 : AtualizaSaldoOPT ;
+			} 
+			
+			delegations : 
+				PT_S_19 to PT_D_19
+		}
+	} 
 
 	activity def GerenciarCadastroClienteAC(novoCliente : ClienteDT) : (clienteValidado : ClienteDT, mensagemResposta : String) {
 		body {
@@ -224,6 +438,12 @@ package ArenaComponents {
 	
 	constraint EnviarCadastroClienteEQ(cliente : ClienteValidadoDT ) : (clienteValidado : ClienteDT) {
 	}
+	
+	executable def EnviarCadastroClienteEX(in dadosValidados : ClienteValidadoDT) : out ClienteDT {
+		let clienteFinal : ClienteDT = dadosValidados->cliente;
+		
+		return clienteFinal;
+	}
 
 	action def EnviarMensagemErroAN(clienteValidado : ClienteValidadoDT ) : String {
 		constraint :
@@ -233,13 +453,80 @@ package ArenaComponents {
 	constraint EnviarMensagemErroEQ(clienteValidado : ClienteValidadoDT ) : (mensagemErro : String) {
 		equation = "Os dados fornecidos não são válidos."
 	}
-boundary
-	component def LeitorQRCode { ports : PT_S_1 : DadosQRCodeOPT ; }
-	component def LeitorRFID2 { ports : PT_S_14 : DetectaPulseiraOPT ; } boundary
-	component def ImpressoraQRCode { ports : PT_D_15 : DadosQRCodeIPT ; } boundary
-	component def Catraca { ports : PT_D_8 : PulseiraDetectadaIPT ; configuration { components :  Detector : Detector { using ports : PT_S_8 : PulseiraDetectadaOPT ; } delegations :  PT_S_8 to PT_D_8 } } boundary
-	component def Detector { ports : PT_S_8 : PulseiraDetectadaOPT ; } component def TerminalAutoatendimento { ports : PT_SD2_3 : InteracaoTela2IOPT ; PT_S_5 : CadastroClienteOPT ; PT_S_6 : RecargaOPT ; PT_D_7 : ConfirmaRecargaIPT ; PT_D_4 : DetectaPulseiraIPT ; configuration { components : TelaTouchScreen : TelaTouchScreen { using ports : PT_SD1_3 : InteracaoTela1IOPT ; } LeitorRFID1 : LeitorRFID1 { using ports : PT_S_4 : DetectaPulseiraOPT ; } delegations : PT_SD1_3 to PT_SD2_3 PT_S_4 to PT_D_4 } }
-	component def Servidor { ports : PT_D_2 : ProdutoRetiradoIPT ; PT_D_5 : CadastroClienteIPT ; PT_S_9 : NotificacaoStatusOPT ; PT_S_10 : PreparoPedidoOPT ; PT_D_11 : PedidoConcluidoIPT ; PT_D_18 : EnvioPedidoIPT ; PT_D_19 : AtualizaSaldoIPT ; configuration { components : ArenaPaySystem : ArenaPaySystem { using ports : PT_D_6 : RecargaIPT ; PT_S_16 : ConfirmaPagamentoOPT ; PT_D_17 : RealizaPagamentoIPT ; PT_S_7 : ConfirmaRecargaOPT ; PT_S_19 : AtualizaSaldoOPT ; } delegations : PT_S_19 to PT_D_19 } } activity def VincularPulseiraAC { body { } } }
+	
+	executable def EnviarMensagemErroEX(in dadosInvalidos : ClienteValidadoDT) : out String {
+		let mensagem : String = "Os dados fornecidos não são válidos.";
+		
+		return mensagem;
+	}
+	
+	activity def VincularPulseiraAC ( clienteAVincular : ClienteDT ) : ( pulseiraAssociada : Boolean ) { 
+		body { 
+			actions : 
+				ler : LerPulseiraAN { 
+					using pins : 
+						solicitante : ClienteDT ;
+				} 
+				
+				associar : AssociarPulseiraAN { 
+					using pins : 
+						cliente : ClienteDT ; 
+						pulseira : PulseiraDT ;
+				} 
+				
+			delegate clienteAVincular to solicitante 
+			delegate clienteAVincular to cliente
+			delegate pulseiraAssociada to associar 
+			
+			flow from ler to pulseira 
+			
+			delegate clienteAVincular to cliente
+		}
+	} 
+	
+	action def LerPulseiraAN (  solicitante : ClienteDT ) : PulseiraDT { 
+		constraint : 
+			post-condition LerPulseiraEQ
+	delegate LerPulseiraAN to pulseiraLida delegate solicitante to solicitante } 
+	
+	constraint LerPulseiraEQ ( solicitante : ClienteDT ) : ( pulseiraLida : PulseiraDT) {
+		equation = pulseiraLida->id != null
+	} 
+	
+	executable def LerPulseiraEX(in solicitante : ClienteDT) : out PulseiraDT {
+		// Criamos uma nova instância de pulseira para simular o que o leitor capturou
+		let novaPulseira : PulseiraDT = new PulseiraDT;
+		
+		// Definimos dados fictícios para simulação
+		novaPulseira->id = "PULSEIRA-12345";
+		novaPulseira->ativo = false;
+		novaPulseira->cliente = null; 
+		
+		return novaPulseira;
+	}
+	
+	action def AssociarPulseiraAN ( cliente : ClienteDT , pulseira : PulseiraDT ) : Boolean { 
+		constraint : 
+		post-condition AssociarPulseiraEQ
+	delegate pulseira to pulseira delegate cliente to cliente delegate AssociarPulseiraAN to associadoComSucesso } 
+	
+	constraint AssociarPulseiraEQ ( cliente : ClienteDT , pulseira : PulseiraDT ) : ( associadoComSucesso : Boolean ) {
+		equation = (pulseira->ativo == false)
+	}
+	
+	executable def AssociarPulseiraEX(in cliente : ClienteDT, in pulseira : PulseiraDT) : out Boolean {
+		let resultadoOperacao : Boolean = false;
+		
+		if (pulseira->ativo == false) {
+			pulseira->ativo = true;
+			pulseira->cliente = cliente;
+			
+			resultadoOperacao = true;
+		}
+		
+		return resultadoOperacao;
+	}
+}
 
 package ArenaPorts {
 	import SysADL.types;
