@@ -62,6 +62,12 @@ package SysADL.types {
 			Valor : Int;
 			cliente : ClienteDT;
 	}
+	
+	datatype ClienteValidadoDT {
+	    attributes :
+	        cliente : ClienteDT;
+	        valido : Boolean;
+	}
 datatype QRCodeDT { attributes : dados : String ; } datatype ProdutoRetiradoDT { attributes : produto : ProdutoDT ; quantidade : Int ; } value type DateTime { } datatype PulseiraDetectadaDT { attributes : Detectada : Boolean ; horario : DateTime ; } datatype DadosTelaDT { attributes : Dados : String ; } datatype PagamentoDT { attributes : dados : String ; cliente : ClienteDT ; } datatype RespostaPagamentoDT { attributes : pagamento : PagamentoDT ; confirmado : Boolean ; } datatype RespostaRecargaDT { attributes : recarga : RecargaDT ; confirmado : Boolean ; } datatype AtualizaSaldoDT { attributes : valor : Real ; cliente : ClienteDT ; } }
 
 package ArenaConnectors {
@@ -158,20 +164,20 @@ package ArenaComponents {
 		
 	configuration { components : Servidor : Servidor { using ports : PT_D_2 : ProdutoRetiradoIPT ; PT_D_5 : CadastroClienteIPT ; PT_S_9 : NotificacaoStatusOPT ; PT_S_10 : PreparoPedidoOPT ; PT_D_11 : PedidoConcluidoIPT ; PT_D_18 : EnvioPedidoIPT ; PT_D_19 : AtualizaSaldoIPT ; } PainelBalcaoEntrega : PainelBalcaoEntrega { using ports : PT_D_9 : NotificacaoStatusIPT ; } ComputadorBalcao : ComputadorBalcao { using ports : PT_S_11 : PedidoConcluidoOPT ; PT_D_10 : PreparoPedidoIPT ; } MaquinaAutomatica : MaquinaAutomatica { using ports : PT_D_1 : DadosQRCodeIPT ; PT_S_2 : ProdutoRetiradoOPT ; } LeitorQRCode : LeitorQRCode { using ports : PT_S_1 : DadosQRCodeOPT ; } ArenaPaySystem : ArenaPaySystem { using ports : PT_D_6 : RecargaIPT ; PT_S_16 : ConfirmaPagamentoOPT ; PT_D_17 : RealizaPagamentoIPT ; PT_S_7 : ConfirmaRecargaOPT ; PT_S_19 : AtualizaSaldoOPT ; } AplicativoCliente : AplicativoCliente { using ports : PT_S_13 : RecargaOPT ; PT_D_12 : ConfirmaRecargaIPT ; } TerminalAutoatendimento : TerminalAutoatendimento { using ports : PT_SD2_3 : InteracaoTela2IOPT ; PT_S_5 : CadastroClienteOPT ; PT_S_6 : RecargaOPT ; PT_D_7 : ConfirmaRecargaIPT ; PT_D_4 : DetectaPulseiraIPT ; } TelaTouchScreen : TelaTouchScreen { using ports : PT_SD1_3 : InteracaoTela1IOPT ; } LeitorRFID1 : LeitorRFID1 { using ports : PT_S_4 : DetectaPulseiraOPT ; } TotemCompra : TotemCompra { using ports : PT_S_18 : EnvioPedidoOPT ; PT_S_15 : DadosQRCodeOPT ; PT_D_14 : DetectaPulseiraIPT ; PT_D_16 : ConfirmaPagamentoIPT ; PT_S_17 : RealizaPagamentoOPT ; } ImpressoraQRCode : ImpressoraQRCode { using ports : PT_D_15 : DadosQRCodeIPT ; } LeitorRFID2 : LeitorRFID2 { using ports : PT_S_14 : DetectaPulseiraOPT ; } Catraca : Catraca { using ports : PT_D_8 : PulseiraDetectadaIPT ; } Detector : Detector { using ports : PT_S_8 : PulseiraDetectadaOPT ; } connectors : Cn1 : CnNotificacao bindings PT_S_9 = PT_D_9 ; Cn2 : CnPreparoPedido bindings PT_S_10 = PT_D_10 ; Cn3 : CnPedidoConcluido bindings PT_S_11 = PT_D_11 ; Cn4 : CnDadosQRCode bindings PT_S_1 = PT_D_1 ; Cn5 : CnAtualizaQuantidade bindings PT_S_2 = PT_D_2 ; Cn6 : CnAtualizaSaldo bindings PT_S_19 = PT_D_19 ; Cn7 : CnConfirmaRecarga bindings PT_S_7 = PT_D_12 ; Cn8 : CnRecarga bindings PT_S_13 = PT_D_6 ; Cn9 : CnConfirmaRecarga bindings PT_S_7 = PT_D_7 ; Cn10 : CnRecarga bindings PT_S_6 = PT_D_6 ; Cn11 : CnApiCliente bindings PT_S_5 = PT_D_5 ; Cn12 : CnInteracaoTela bindings PT_SD1_3 = PT_SD2_3 ; Cn13 : CnDetectaPulseira bindings PT_S_4 = PT_D_4 ; Cn14 : CnApiPedido bindings PT_S_18 = PT_D_18 ; Cn15 : CnPagamento bindings PT_S_17 = PT_D_17 ; Cn16 : CnConfirmaPagamento bindings PT_S_16 = PT_D_16 ; Cn17 : CnDadosQRCode bindings PT_S_15 = PT_D_15 ; Cn18 : CnDetectaPulseira bindings PT_S_14 = PT_D_14 ; Cn19 : CnPulseiraDetectada bindings PT_S_8 = PT_D_8 ; } }
 
-	activity def GerenciarCadastroClienteAC(novoCliente : Cliente) : (clienteValidado : Cliente, mensagemResposta : String) {
+	activity def GerenciarCadastroClienteAC(novoCliente : ClienteDT) : (clienteValidado : ClienteDT, mensagemResposta : String) {
 		body {
 			actions :
 				vccan : ValidarCadastroClienteAN {
 					using pins :
-						novoCliente : Cliente;
+						novoCliente : ClienteDT;
 				}
 				eccan : EnviarCadastroClienteAN {
 					using pins :
-						clienteValidado : ResultadoValidacaoCliente;
+						clienteValidado : ClienteValidadoDT ;
 				}
 				emen : EnviarMensagemErroAN {
 					using pins :
-						clienteValidado1 : ResultadoValidacaoCliente;
+						clienteValidado1 : ClienteValidadoDT ;
 				}
 			delegate novoCliente to novoCliente
 			
@@ -182,18 +188,18 @@ package ArenaComponents {
 		flow from  vccan to clienteValidado flow from vccan to clienteValidado1 }
 	}
 
-	action def ValidarCadastroClienteAN(novoCliente : Cliente) : ResultadoValidacaoCliente {
+	action def ValidarCadastroClienteAN(novoCliente : ClienteDT) : ClienteValidadoDT  {
 		constraint :
 			post-condition ValidarCadastroClienteEQ
 		delegate novoCliente to novoCliente 
 		delegate ValidarCadastroClienteAN to clienteValidado 
 	}
 
-	constraint ValidarCadastroClienteEQ(novoCliente : Cliente) : (clienteValidado : ResultadoValidacaoCliente) {
+	constraint ValidarCadastroClienteEQ(novoCliente : ClienteDT) : (clienteValidado : ClienteValidadoDT ) {
 		equation = (novoCliente->nome != null) ? (novoCliente->senha != null && novoCliente->senha > 6) : false
 	}
 	
-	executable def ValidarCadastroClienteEX(in novoCliente : Cliente) : out ResultadoValidacaoCliente {
+	executable def ValidarCadastroClienteEX(in novoCliente : ClienteDT) : out ClienteValidadoDT  {
 		let valido : Boolean = false;
 		
         if (novoCliente->nome != null) {
@@ -202,29 +208,29 @@ package ArenaComponents {
             }
         }
         
-        let resultado : ResultadoValidacaoCliente = new ResultadoValidacaoCliente;
+        let resultado : ClienteValidadoDT  = new ClienteValidadoDT ;
 		resultado->valido = valido;
 		resultado->cliente = novoCliente;
         
         return resultado;
 	}
 
-	action def EnviarCadastroClienteAN(cliente : ResultadoValidacaoCliente) : Cliente {
+	action def EnviarCadastroClienteAN(cliente : ClienteValidadoDT ) : ClienteDT {
 		constraint :
 			post-condition EnviarCadastroClienteEQ
 	 	delegate cliente to cliente 
 	 	delegate EnviarCadastroClienteAN to clienteValidado
 	 }
 	
-	constraint EnviarCadastroClienteEQ(cliente : ResultadoValidacaoCliente) : (clienteValidado : Cliente) {
+	constraint EnviarCadastroClienteEQ(cliente : ClienteValidadoDT ) : (clienteValidado : ClienteDT) {
 	}
 
-	action def EnviarMensagemErroAN(clienteValidado : ResultadoValidacaoCliente) : String {
+	action def EnviarMensagemErroAN(clienteValidado : ClienteValidadoDT ) : String {
 		constraint :
 			post-condition EnviarMensagemErroEQ
 	delegate clienteValidado to clienteValidado delegate EnviarMensagemErroAN to mensagemErro }
 
-	constraint EnviarMensagemErroEQ(clienteValidado : ResultadoValidacaoCliente) : (mensagemErro : String) {
+	constraint EnviarMensagemErroEQ(clienteValidado : ClienteValidadoDT ) : (mensagemErro : String) {
 		equation = "Os dados fornecidos não são válidos."
 	}
 boundary
@@ -233,7 +239,7 @@ boundary
 	component def ImpressoraQRCode { ports : PT_D_15 : DadosQRCodeIPT ; } boundary
 	component def Catraca { ports : PT_D_8 : PulseiraDetectadaIPT ; configuration { components :  Detector : Detector { using ports : PT_S_8 : PulseiraDetectadaOPT ; } delegations :  PT_S_8 to PT_D_8 } } boundary
 	component def Detector { ports : PT_S_8 : PulseiraDetectadaOPT ; } component def TerminalAutoatendimento { ports : PT_SD2_3 : InteracaoTela2IOPT ; PT_S_5 : CadastroClienteOPT ; PT_S_6 : RecargaOPT ; PT_D_7 : ConfirmaRecargaIPT ; PT_D_4 : DetectaPulseiraIPT ; configuration { components : TelaTouchScreen : TelaTouchScreen { using ports : PT_SD1_3 : InteracaoTela1IOPT ; } LeitorRFID1 : LeitorRFID1 { using ports : PT_S_4 : DetectaPulseiraOPT ; } delegations : PT_SD1_3 to PT_SD2_3 PT_S_4 to PT_D_4 } }
-	component def Servidor { ports : PT_D_2 : ProdutoRetiradoIPT ; PT_D_5 : CadastroClienteIPT ; PT_S_9 : NotificacaoStatusOPT ; PT_S_10 : PreparoPedidoOPT ; PT_D_11 : PedidoConcluidoIPT ; PT_D_18 : EnvioPedidoIPT ; PT_D_19 : AtualizaSaldoIPT ; configuration { components : ArenaPaySystem : ArenaPaySystem { using ports : PT_D_6 : RecargaIPT ; PT_S_16 : ConfirmaPagamentoOPT ; PT_D_17 : RealizaPagamentoIPT ; PT_S_7 : ConfirmaRecargaOPT ; PT_S_19 : AtualizaSaldoOPT ; } delegations : PT_S_19 to PT_D_19 } } }
+	component def Servidor { ports : PT_D_2 : ProdutoRetiradoIPT ; PT_D_5 : CadastroClienteIPT ; PT_S_9 : NotificacaoStatusOPT ; PT_S_10 : PreparoPedidoOPT ; PT_D_11 : PedidoConcluidoIPT ; PT_D_18 : EnvioPedidoIPT ; PT_D_19 : AtualizaSaldoIPT ; configuration { components : ArenaPaySystem : ArenaPaySystem { using ports : PT_D_6 : RecargaIPT ; PT_S_16 : ConfirmaPagamentoOPT ; PT_D_17 : RealizaPagamentoIPT ; PT_S_7 : ConfirmaRecargaOPT ; PT_S_19 : AtualizaSaldoOPT ; } delegations : PT_S_19 to PT_D_19 } } activity def VincularPulseiraAC { body { } } }
 
 package ArenaPorts {
 	import SysADL.types;
