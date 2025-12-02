@@ -526,6 +526,79 @@ package ArenaComponents {
 		
 		return resultadoOperacao;
 	}
+	
+	
+	activity def RealizarCompraAC ( pulseira : PulseiraDT ) ( senhaDigitada : Int ) ( valorTotal : Real ) : ( pedidoGerado : PedidoDT , compraSucesso : Boolean ) { 
+		body { 
+			actions : 
+				validar : ValidarCompraAN { 
+					using pins : 
+						pulseira : PulseiraDT ; 
+						senha : Int ; 
+						valor : Real ;
+				}
+		
+				processar : ProcessarPedidoAN { 
+					using pins : 
+						autorizado : Boolean ; 
+						valorIn : Real ;
+				} 
+				
+			delegate senhaDigitada to senha 
+			delegate valorTotal to valor 
+			delegate pulseira to pulseira 
+			delegate pedidoGerado to processar 
+			delegate compraSucesso to validar 
+			flow from validar to autorizado 
+		delegate valorTotal to valorIn }
+	} 
+	
+	action def ValidarCompraAN ( pulseira : PulseiraDT , senha : Int , valor : Real ) : Boolean { 
+		constraint : 
+			post-condition ValidarCompraEQ
+	delegate pulseira to pulseira delegate senha to senha delegate valor to valor delegate ValidarCompraAN to autorizado } 
+	
+	constraint ValidarCompraEQ ( pulseira : PulseiraDT , senha : Int , valor : Real ) : ( autorizado : Boolean ) { 
+		equation = "A senha informada deve ser idêntica à senha cadastrada do cliente e o saldo disponível na conta deve ser maior ou igual ao valor total da compra."
+	}
+	
+	executable def ValidarCompraEX (in pulseira : PulseiraDT, in senha : Int, in valor : Real) : out Boolean {
+		let autorizado : Boolean = false;
+		
+		if (pulseira.cliente.senha == senha) {
+			if (pulseira.cliente.saldoContra >= valor) {
+				autorizado = true;
+			}
+		}
+		
+		return autorizado;
+	}
+	
+	action def ProcessarPedidoAN ( autorizado : Boolean , valor : Real ) : PedidoDT { 
+		constraint : 
+			post-condition ProcessarPedidoEQ
+	delegate autorizado to autorizado delegate valor to valor delegate ProcessarPedidoAN to pedido } 
+	
+	constraint ProcessarPedidoEQ ( autorizado : Boolean , valor : Real ) : ( pedido : PedidoDT ) {
+		equation = (autorizado == true) ? (pedido->qrCode != null) : (pedido == null)
+	}
+	
+	executable def ProcessarPedidoEX(in autorizado : Boolean, in valor : Real) : out PedidoDT {
+		var novoPedido : PedidoDT = null;
+		
+		if (autorizado == true) {
+			novoPedido = new PedidoDT;
+			
+			// Simula a geração de dados do pedido
+			novoPedido->id = "PEDIDO-001";
+			novoPedido->qrCode = "QR-XYZ-123"; // O código que será impresso
+			novoPedido->numeroOrdem = 55;
+			
+			// Nota: Em um sistema real, aqui também debitaríamos o saldo do cliente
+		}
+		
+		return novoPedido;
+	}
 }
 
 package ArenaPorts {
