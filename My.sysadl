@@ -599,6 +599,67 @@ package ArenaComponents {
 		
 		return novoPedido;
 	}
+
+	activity def ProcessarRecargaAC(cliente : ClienteDT, valorRecarga : Real) : (saldoAtualizado : Real, sucesso : Boolean) {
+		body {
+			actions :
+				validarPag : ValidarPagamentoRecargaAN {
+					using pins :
+						valor : Real;
+				}
+				atualizar : AtualizarSaldoAN {
+					using pins :
+						clienteIn : ClienteDT;
+						valorAdicional : Real;
+						validado : Boolean;
+				}
+			
+			delegate valorRecarga to valor
+			delegate cliente to clienteIn
+			delegate valorRecarga to valorAdicional
+			
+			flow from validarPag to validado
+			
+      delegate saldoAtualizado to atualizar
+      delegate sucesso to validarPag
+		}
+	}
+
+	action def ValidarPagamentoRecargaAN(valor : Real) : Boolean {
+		constraint : post-condition ValidarPagamentoEQ
+		delegate valor to valor
+	}
+
+	constraint ValidarPagamentoEQ(valor : Real) : (pagamentoConfirmado : Boolean) {
+		equation = (valor > 0)
+	}
+
+	executable def ValidarPagamentoRecargaEX(in valor : Real) : out Boolean {
+		if (valor > 0) {
+			return true;
+		}
+		return false;
+	}
+
+	action def AtualizarSaldoAN(clienteIn : ClienteDT, valorAdicional : Real, validado : Boolean) : Real {
+		constraint : post-condition AtualizarSaldoEQ
+		delegate clienteIn to clienteIn
+		delegate valorAdicional to valorAdicional
+		delegate validado to validado
+	}
+
+	constraint AtualizarSaldoEQ(clienteIn : ClienteDT, valorAdicional : Real, validado : Boolean) : (novoSaldo : Real) {
+		equation = (validado == true) ? (clienteIn->saldoContra + valorAdicional) : clienteIn->saldoContra
+	}
+
+	executable def AtualizarSaldoEX(in clienteIn : ClienteDT, in valorAdicional : Real) : out Real {
+		var saldoFinal : Real = 0.0;
+		if (clienteIn != null) {
+			clienteIn->saldoContra = clienteIn->saldoContra + valorAdicional;
+			saldoFinal = clienteIn->saldoContra;
+		}
+		return saldoFinal;
+	}
 }
 
 package ArenaPorts {
