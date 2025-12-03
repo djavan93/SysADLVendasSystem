@@ -412,6 +412,22 @@ package ArenaComponents {
 	constraint ValidarCadastroClienteEQ(novoCliente : ClienteDT) : (clienteValidado : ClienteValidadoDT ) {
 		equation = (novoCliente->nome != null) ? (novoCliente->senha != null && novoCliente->senha > 6) : false
 	}
+	
+	executable def ValidarCadastroClienteEX(in novoCliente : ClienteDT) : out ClienteValidadoDT  {
+		let valido : Boolean = false;
+		
+        if (novoCliente->nome != null) {
+            if (novoCliente->senha != null && novoCliente->senha > 6) {
+                valido = true;
+            }
+        }
+        
+        let resultado : ClienteValidadoDT  = new ClienteValidadoDT ;
+		resultado->valido = valido;
+		resultado->cliente = novoCliente;
+        
+        return resultado;
+	}
 
 	action def EnviarCadastroClienteAN(cliente : ClienteValidadoDT ) : ClienteDT {
 		constraint :
@@ -422,6 +438,12 @@ package ArenaComponents {
 	
 	constraint EnviarCadastroClienteEQ(cliente : ClienteValidadoDT ) : (clienteValidado : ClienteDT) {
 	}
+	
+	executable def EnviarCadastroClienteEX(in dadosValidados : ClienteValidadoDT) : out ClienteDT {
+		let clienteFinal : ClienteDT = dadosValidados->cliente;
+		
+		return clienteFinal;
+	}
 
 	action def EnviarMensagemErroAN(clienteValidado : ClienteValidadoDT ) : String {
 		constraint :
@@ -430,6 +452,12 @@ package ArenaComponents {
 
 	constraint EnviarMensagemErroEQ(clienteValidado : ClienteValidadoDT ) : (mensagemErro : String) {
 		equation = "Os dados fornecidos não são válidos."
+	}
+	
+	executable def EnviarMensagemErroEX(in dadosInvalidos : ClienteValidadoDT) : out String {
+		let mensagem : String = "Os dados fornecidos não são válidos.";
+		
+		return mensagem;
 	}
 	
 	activity def VincularPulseiraAC ( clienteAVincular : ClienteDT ) : ( pulseiraAssociada : Boolean ) { 
@@ -465,6 +493,18 @@ package ArenaComponents {
 		equation = pulseiraLida->id != null
 	} 
 	
+	executable def LerPulseiraEX(in solicitante : ClienteDT) : out PulseiraDT {
+		// Criamos uma nova instância de pulseira para simular o que o leitor capturou
+		let novaPulseira : PulseiraDT = new PulseiraDT;
+		
+		// Definimos dados fictícios para simulação
+		novaPulseira->id = "PULSEIRA-12345";
+		novaPulseira->ativo = false;
+		novaPulseira->cliente = null; 
+		
+		return novaPulseira;
+	}
+	
 	action def AssociarPulseiraAN ( cliente : ClienteDT , pulseira : PulseiraDT ) : Boolean { 
 		constraint : 
 		post-condition AssociarPulseiraEQ
@@ -472,6 +512,19 @@ package ArenaComponents {
 	
 	constraint AssociarPulseiraEQ ( cliente : ClienteDT , pulseira : PulseiraDT ) : ( associadoComSucesso : Boolean ) {
 		equation = (pulseira->ativo == false)
+	}
+	
+	executable def AssociarPulseiraEX(in cliente : ClienteDT, in pulseira : PulseiraDT) : out Boolean {
+		let resultadoOperacao : Boolean = false;
+		
+		if (pulseira->ativo == false) {
+			pulseira->ativo = true;
+			pulseira->cliente = cliente;
+			
+			resultadoOperacao = true;
+		}
+		
+		return resultadoOperacao;
 	}
 	
 	activity def RealizarCompraAC ( pulseira : PulseiraDT ) ( senhaDigitada : Int ) ( valorTotal : Real ) : ( pedidoGerado : PedidoDT , compraSucesso : Boolean ) { 
@@ -508,6 +561,10 @@ package ArenaComponents {
 		equation = "A senha informada deve ser idêntica à senha cadastrada do cliente e o saldo disponível na conta deve ser maior ou igual ao valor total da compra."
 	}
 	
+	executable def ValidarCompraEX (in pulseira : PulseiraDT, in senha : Int, in valor : Real) : out Boolean {
+		return true;
+	}
+	
 	action def ProcessarPedidoAN ( autorizado : Boolean , valor : Real ) : PedidoDT { 
 		constraint : 
 			post-condition ProcessarPedidoEQ
@@ -515,6 +572,11 @@ package ArenaComponents {
 	
 	constraint ProcessarPedidoEQ ( autorizado : Boolean , valor : Real ) : ( pedido : PedidoDT ) {
 		equation = (autorizado == true) ? (pedido->qrCode != null) : (pedido == null)
+	}
+	
+	executable def ProcessarPedidoEX(in autorizado : Boolean, in valor : Real) : out PedidoDT {
+		let res : PedidoDT = null;
+		return res;
 	}
 
 	activity def ProcessarRecargaAC(cliente : ClienteDT ) ( valorRecarga : Real) : (saldoAtualizado : Real, sucesso : Boolean) {
@@ -588,7 +650,7 @@ activity def ControlarSaidaAC(dadosSensor : PulseiraDetectadaDT) : (catracaLiber
 	}
 }
 
-action def AnalisarRiscoSaidaAN ( sinalSensor : PulseiraDetectadaDT ) : Boolean { 		constraint : post-condition AnalisarRiscoEQ delegate sinalSensor to sinalSensor } action def AtuarMecanismoSaidaAN ( riscoDetectado : Boolean ) : Boolean { constraint : post-condition AtuarMecanismoEQ delegate riscoDetectado to riscoDetectado } constraint AnalisarRiscoEQ (sinalSensor : PulseiraDetectadaDT) : (risco : Boolean) { equation = (sinalSensor->Detectada == true) } constraint AtuarMecanismoEQ (riscoDetectado : Boolean) : (liberado : Boolean, alarme : Boolean) { equation = riscoDetectado ? (false, true) : (true, false) } }
+action def AnalisarRiscoSaidaAN ( sinalSensor : PulseiraDetectadaDT ) : Boolean { 		constraint : post-condition AnalisarRiscoEQ delegate sinalSensor to sinalSensor delegate sinalSensor to sinalSensor delegate AnalisarRiscoSaidaAN to risco } action def AtuarMecanismoSaidaAN ( riscoDetectado : Boolean ) : Boolean { constraint : post-condition AtuarMecanismoEQ delegate riscoDetectado to riscoDetectado delegate AtuarMecanismoSaidaAN to liberado delegate AtuarMecanismoSaidaAN to alarme } constraint AnalisarRiscoEQ (sinalSensor : PulseiraDetectadaDT) : (risco : Boolean) { equation = (sinalSensor->Detectada == true) } constraint AtuarMecanismoEQ (riscoDetectado : Boolean) : (liberado : Boolean, alarme : Boolean) { equation = riscoDetectado ? (false ) : (true ) } }
 
 package ArenaPorts {
 	import SysADL.types;
