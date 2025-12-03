@@ -624,22 +624,55 @@ package ArenaComponents {
 		equation = (validado == true) ? (clienteIn->saldoContra + valorAdicional) : clienteIn->saldoContra
 	}
 
-activity def RetirarProdutoAC(qrCodeLido : String) : (portaDestravada : Boolean) {body { actions : verificar : VerificarPedidoProntoAN { using pins : codigo : String; } liberar : LiberarMecanismoAN { using pins : pedidoValido : Boolean; } delegate qrCodeLido to codigo flow from verificar to pedidoValido delegate portaDestravada to liberar } } constraint VerificarPedidoEQ ( ) { equation = (codigo != null) } constraint LiberarMecanismoEQ ( ) { equation = (pedidoValido == true) } action def VerificarPedidoProntoAN ( codigo : String ) : Boolean {   constraint : post-condition VerificarPedidoEQ
-  delegate codigo to codigo } action def LiberarMecanismoAN ( pedidoValido : Boolean ) : Boolean { constraint : post-condition LiberarMecanismoEQ
-  delegate pedidoValido to pedidoValido } 
+	activity def RetirarProdutoAC(qrCodeLido : String) : (portaDestravada : Boolean) {
+		body { 
+			actions : 
+				verificar : VerificarPedidoProntoAN { 
+					using pins : codigo : String;
+				} 
+				
+				liberar : LiberarMecanismoAN { 
+					using pins : pedidoValido : Boolean;
+				} 
+				
+				delegate qrCodeLido to codigo 
+				flow from verificar to pedidoValido 
+				delegate portaDestravada to liberar
+		}
+	} 
+	
+	constraint VerificarPedidoEQ ( ) { 
+		equation = (codigo != null)
+	} 
+	
+	constraint LiberarMecanismoEQ ( ) { 
+		equation = (pedidoValido == true)
+	} 
+	
+	action def VerificarPedidoProntoAN ( codigo : String ) : Boolean {   
+		constraint : 
+			post-condition VerificarPedidoEQ
+  		delegate codigo to codigo 
+  	} 
+  	
+  	action def LiberarMecanismoAN ( pedidoValido : Boolean ) : Boolean { 
+  		constraint : 
+  			post-condition LiberarMecanismoEQ
+  		delegate pedidoValido to pedidoValido 
+  	} 
 
-activity def ControlarSaidaAC(dadosSensor : PulseiraDetectadaDT) : (catracaLiberada : Boolean, alarmeAtivado : Boolean) {
-	body {
-		actions :
-			analisar : AnalisarRiscoSaidaAN {
-				using pins :
-					sinalSensor : PulseiraDetectadaDT;
-			}
-			
-			atuar : AtuarMecanismoSaidaAN {
-				using pins :
-					riscoDetectado : Boolean;
-			}
+	activity def ControlarSaidaAC(dadosSensor : PulseiraDetectadaDT) : (catracaLiberada : Boolean, alarmeAtivado : Boolean) {
+		body {
+			actions :
+				analisar : AnalisarRiscoSaidaAN {
+					using pins :
+						sinalSensor : PulseiraDetectadaDT;
+				}
+				
+				atuar : AtuarMecanismoSaidaAN {
+					using pins :
+						riscoDetectado : Boolean;
+				}
 
 		delegate dadosSensor to sinalSensor
 		
@@ -647,10 +680,35 @@ activity def ControlarSaidaAC(dadosSensor : PulseiraDetectadaDT) : (catracaLiber
 		
 		delegate catracaLiberada to atuar
 		delegate alarmeAtivado to atuar
+		}
 	}
-}
 
-action def AnalisarRiscoSaidaAN ( sinalSensor : PulseiraDetectadaDT ) : Boolean { 		constraint : post-condition AnalisarRiscoEQ delegate sinalSensor to sinalSensor delegate sinalSensor to sinalSensor delegate AnalisarRiscoSaidaAN to risco } action def AtuarMecanismoSaidaAN ( riscoDetectado : Boolean ) : Boolean { constraint : post-condition AtuarMecanismoEQ delegate riscoDetectado to riscoDetectado delegate AtuarMecanismoSaidaAN to liberado delegate AtuarMecanismoSaidaAN to alarme } constraint AnalisarRiscoEQ (sinalSensor : PulseiraDetectadaDT) : (risco : Boolean) { equation = (sinalSensor->Detectada == true) } constraint AtuarMecanismoEQ (riscoDetectado : Boolean) : (liberado : Boolean, alarme : Boolean) { equation = riscoDetectado ? (false ) : (true ) } }
+	action def AnalisarRiscoSaidaAN ( sinalSensor : PulseiraDetectadaDT ) : Boolean { 		
+		constraint : 
+			post-condition AnalisarRiscoEQ 
+		
+		delegate sinalSensor to sinalSensor 
+		delegate sinalSensor to sinalSensor 
+		delegate AnalisarRiscoSaidaAN to risco
+	} 
+	
+	action def AtuarMecanismoSaidaAN ( riscoDetectado : Boolean ) : Boolean { 
+		constraint : 
+			post-condition AtuarMecanismoEQ 
+			
+		delegate riscoDetectado to riscoDetectado 
+		delegate AtuarMecanismoSaidaAN to liberado 
+		delegate AtuarMecanismoSaidaAN to alarme
+	} 
+	
+	constraint AnalisarRiscoEQ (sinalSensor : PulseiraDetectadaDT) : (risco : Boolean) { 
+		equation = (sinalSensor->Detectada == true)
+	} 
+	
+	constraint AtuarMecanismoEQ (riscoDetectado : Boolean) : (liberado : Boolean, alarme : Boolean) { 
+		equation = riscoDetectado ? (false ) : (true )
+	} 
+}
 
 package ArenaPorts {
 	import SysADL.types;
